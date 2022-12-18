@@ -17,6 +17,7 @@ class ReadReceipt {
   role: string = "";
   checked: boolean = false;
   checkedBy: string = "";
+  checkedDate: string | null = null;
 
   constructor(id: number) {
     this.id = String(id);
@@ -37,10 +38,13 @@ function Widget() {
           checkedBy = "Visitor";
         }
 
+        const checkedDate = new Date().toString();
+
         readReceipts.set(readReceipt.id, {
           ...readReceipt,
           checked: true,
           checkedBy,
+          checkedDate,
         });
       } else {
         figma.notify(
@@ -52,6 +56,7 @@ function Widget() {
         ...readReceipt,
         checked: false,
         checkedBy: "",
+        checkedDate: null,
       });
     }
   }
@@ -73,6 +78,13 @@ function Widget() {
     }
   }
 
+  function getCheckedDateFormat(checkedDate: string) {
+    const date = new Date(checkedDate);
+    return `${date.toLocaleString("default", {
+      month: "short",
+    })} ${date.getDate()}`;
+  }
+
   const svgSuccess = `
     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
     <circle cx="20" cy="20" r="20" fill="#00A310"/>
@@ -88,17 +100,29 @@ function Widget() {
         width={"fill-parent"}
         key={readReceipt.id}
       >
-        {!readReceipt.checked ? (
-          <Ellipse
-            height={40}
-            width={40}
-            stroke={"#000000"}
-            fill={"#ffffff"}
-            onClick={() => toggleCheck(readReceipt)}
-          />
-        ) : (
-          <SVG src={svgSuccess} onClick={() => toggleCheck(readReceipt)} />
-        )}
+        <AutoLayout
+          direction="vertical"
+          horizontalAlignItems={"center"}
+          width={65}
+          spacing={6}
+        >
+          {!readReceipt.checked ? (
+            <Ellipse
+              height={40}
+              width={40}
+              stroke={"#000000"}
+              fill={"#ffffff"}
+              onClick={() => toggleCheck(readReceipt)}
+            />
+          ) : (
+            <SVG src={svgSuccess} onClick={() => toggleCheck(readReceipt)} />
+          )}
+          {readReceipt.checkedDate ? (
+            <Text fontSize={18}>
+              {getCheckedDateFormat(readReceipt.checkedDate)}
+            </Text>
+          ) : null}
+        </AutoLayout>
         <AutoLayout direction="vertical" spacing={4} width="fill-parent">
           <Input
             value={readReceipt.role}
@@ -118,16 +142,18 @@ function Widget() {
   return (
     <AutoLayout
       spacing={16}
-      padding={32}
+      padding={16}
       cornerRadius={16}
       fill={"#FFFFFF"}
       stroke={"#E6E6E6"}
       width={400}
       direction={"vertical"}
     >
-      <Text fontSize={36} fontWeight={700}>
-        Read Receipts
-      </Text>
+      <AutoLayout padding={{ top: 16, left: 16, right: 0, bottom: 0 }}>
+        <Text fontSize={36} fontWeight={700}>
+          Read Receipts
+        </Text>
+      </AutoLayout>
       {readReceipts
         .entries()
         .map((readReceipt) => renderReadReceipt(readReceipt[1]))}
