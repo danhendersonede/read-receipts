@@ -1,0 +1,13 @@
+{
+  "name": "Read Receipts",
+  "id": "1186072374350504794",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "editorType": [
+    "figma",
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "permissions": ["currentuser"]
+}
